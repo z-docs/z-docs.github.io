@@ -1,0 +1,17 @@
+{
+  "name": "z-docs.github.io",
+  "version": "1.0.0",
+  "description": "Documentation project for z-service",
+  "main": "index.js",
+  "repository": "https://github.com/z-docs/z-docs.github.io.git",
+  "author": "muguddy <seungil.han@gmail.com>",
+  "license": "MIT",
+  "scripts":{
+    "dev" : "vuepress dev docs",
+    "build" : "vuepress build docs"
+  },
+  "devDependencies": {
+    "markdown-it": "^8.4.2",
+    "vuepress": "^0.14.8"
+  }
+}
