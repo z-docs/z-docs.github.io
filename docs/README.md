@@ -9,5 +9,5 @@ features:
   details: Database service based on zcp(Kubernetes) including DBA process & function.
 - title: ZMON
   details: Watch & Monitoring every resource in realtime. Get the alarm from your metric configuration.
-footer: MIT Licensed | Copyright © 2019-present myguddy 
+footer: v0.0.2 MIT Licensed | Copyright © 2019-present myguddy
 ---
