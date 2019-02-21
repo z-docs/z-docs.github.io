@@ -51,7 +51,7 @@ spring-boot-cicd-demo-dev-rolling 이름으로 Pipeline작성
 6. *VERSION* 변수선언 주석 처리
 
 ```groovy
-// def VERSION = ‘develop’
+// def VERSION = 'develop'
 ```
 7. Job 설정의 Deploy 변경
 
@@ -99,7 +99,7 @@ def TYPE = 'deployment' // Rollback Resource Type: Deployment/Statefulset etc
 def DEPLOY_NAME = 'spring-boot-cicd-demo' // Name of resource
 
 podTemplate(label:label,
-    serviceAccount: ＂zcp-system-sa-${ZCP_USERID}＂,
+    serviceAccount: "zcp-system-sa-${ZCP_USERID}",
     containers: [
         // Kubectl 수행을 위한 kubectl container 만 기동시킴
         containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl', ttyEnabled: true, command: 'cat')
