@@ -7,7 +7,7 @@ sidebarDepth: 0
 
 # Logging Overview
 ::: tip
-* 클라우드 환경에서 동적으로 생성되고 소멸되는 Applicarion/Platform Log 복잡도 증가
+* 클라우드 환경에서 동적으로 생성되고 소멸되는 Application/Platform Log 복잡도 증가
 * 단순 로그에서 분석데이터로 활용
 * 로그데이터 관리의 어려움: 출처 확인, 데이터 크기 증가 등
 :::
