@@ -132,9 +132,9 @@ next: step03
   
 ```groovy
 // Jenkins Shared Library 적용
-@Library(‘retort-lib’) _
+@Library('retort-lib') _
 // Jenkins slave pod에 uuid 생성
-def label = “Jenkins-${UUID.randomUUID().toString()}”
+def label = "Jenkins-${UUID.randomUUID().toString()}"
 def ZCP_USERID = 'edu01'
 def DOCKER_IMAGE = 'edu01/spring-boot-cicd-demo' // Harbor Project Name : edu01
 def K8S_NAMESPACE = 'edu01'
@@ -142,8 +142,8 @@ def VERSION = 'develop'
 
 // Pod template 시작
 podTemplate(label:label,
-    // Kubernetes cluster에 배포하기 위한 secret
-    serviceAccount: “zcp-system-sa-${ZCP_USERID}”,
+    // Kubernetes cluster에 배포하기 위한 secret
+    serviceAccount: "zcp-system-sa-${ZCP_USERID}",
     ...){
         ......
     }
@@ -195,7 +195,7 @@ spec:
 1. Git checkout
 2. Source Build(Maven): Public Maven Repository 접근이 안되는 경우, Jenkins에 Private Nexus 서버 설정 필요함.
 3. Docker Image Build: ZCP 용 Private Registry 주소를 위한  ${HARBOR_REGISTRY}는 내장된 변수로서, Public Docker Hub를 사용할 경우 생략 또는 Registry 주소를 명시적으로 지정해야함 
-`dockerCmd.build tag: ${HARBOR_REGISTRY}/${DOCKER_IMAGE}:${VERSION}"`
+`dockerCmd.build tag: "${HARBOR_REGISTRY}/${DOCKER_IMAGE}:${VERSION}"`
 4. Deploy: 필요한 kubectl 명령어를 반복해서 적용
 `kubeCmd.apply file: 'k8s/service.yaml', namespace: K8S_NAMESPACE`
 
