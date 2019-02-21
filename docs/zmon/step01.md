@@ -37,7 +37,7 @@ next: false
 </dependency>
 
 ```
-3. springboot(application.yaml) properites 수정
+3. springboot(application.yaml) properties 수정
 ```yaml
 #Metrics related configurations
 management:
