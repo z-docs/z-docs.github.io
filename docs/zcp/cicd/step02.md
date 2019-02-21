@@ -172,7 +172,6 @@ podTemplate(label:label,
 
 Script Source
 ```groovy
-<<<<<<< HEAD
 @Library('retort-lib') _
 def label = "jenkins-${UUID.randomUUID().toString()}"
  
@@ -191,38 +190,6 @@ podTemplate(label:label,
     volumes: [
         hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
         persistentVolumeClaim(mountPath: '/root/.m2', claimName: 'zcp-jenkins-mvn-repo-custom2')
-=======
-// Jenkins Shared Library 적용
-@Library('retort-lib') _
-// Jenkins slave pod에 uid 생성
-def label = "Jenkins-${UUID.randomUUID().toString()}"
-// Kubernetes cluster에 배포하기 위한 사용자 계정
-def ZCP_USERID = 'edu01'
-// Docker image 명
-def DOCKER_IMAGE = 'edu01/spring-boot-cicd-demo'
-// 배포 할 Kubernetes namespace
-def K8S_NAMESPACE = 'edu01'
-// Docker Image 의 Tag
-def VERSION = 'develop'
-
-// Pod template 시작
-podTemplate(label:label,
-
-    // Kubernetes cluster에 배포하기 위한 secret
-    serviceAccount: "zcp-system-sa-${ZCP_USERID}",
-
-    // 빌드를 실행 할 Jenkins slave pod 환경 구성
-    containers: [
-        containerTemplate(name: 'maven', image: 'maven:3.5.2-jdk-8-alpine', ttyEnabled: true, command: 'cat'),     
-        containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
-        containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl', ttyEnabled: true, command: 'cat')
-    ],
-
-    // Pod에 연결할 Volume 설정
-    volumes: [
-        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'), 
-        persistentVolumeClaim(mountPath: '/root/.m2', claimName: 'zcp-Jenkins-mvn-repo')
->>>>>>> f27bd9835020ba16a5224fa1f352bf0125165bb4
     ]) {
  
     node(label) {
@@ -238,34 +205,15 @@ podTemplate(label:label,
  
         stage('BUILD DOCKER IMAGE') {
             container('docker') {
-<<<<<<< HEAD
                 dockerCmd.build tag: "${HARBOR_REGISTRY}/${DOCKER_IMAGE}:${VERSION}"
                 dockerCmd.push registry: HARBOR_REGISTRY, imageName: DOCKER_IMAGE, imageVersion: VERSION, credentialsId: "HARBOR_CREDENTIALS"
             }
         }
  
         stage('DEPLOY') {
-=======
-                // docker build 실행
-                // Dockerfile 명, 위치를 별도로 지정하지 않는 경우 소스 코드 root 의 Dockerfile 을 이용해 빌드
-                dockerCmd.build tag: "${HARBOR_REGISTRY}/${DOCKER_IMAGE}:${VERSION}"
-                // Image Registry 에 Docker image push
-                dockerCmd.push registry: HARBOR_REGISTRY, imageName: DOCKER_IMAGE, imageVersion: VERSION, credentialsId: 'HARBOR_CREDENTIALS'
-            }
-        }
-        // Kubernetes 배포 Stage
-        stage('DEPLOY') {
-            // kubectl container 에서 동작 수행
->>>>>>> f27bd9835020ba16a5224fa1f352bf0125165bb4
             container('kubectl') {
                 kubeCmd.apply file: 'k8s/service.yaml', namespace: K8S_NAMESPACE
-<<<<<<< HEAD
                 kubeCmd.apply file: 'k8s/ingress.yaml', namespace: K8S_NAMESPACE
-=======
-                // ingress 생성 또는 업데이트
-                kubeCmd.apply file: 'k8s/ingress.yaml', namespace: K8S_NAMESPACE
-                // deployment 생성 또는 업데이트
->>>>>>> f27bd9835020ba16a5224fa1f352bf0125165bb4
                 kubeCmd.apply file: 'k8s/deployment.yaml', namespace: K8S_NAMESPACE, wait: 300
             }
         }
