@@ -140,7 +140,7 @@ spec:
 // Jenkins Shared Library 적용
 @Library("retort-lib") _
 // Jenkins slave pod에 uuid 생성
-def label = “Jenkins-${UUID.randomUUID().toString()}”
+def label = "Jenkins-${UUID.randomUUID().toString()}"
 def ZCP_USERID = 'edu99'
 def DOCKER_IMAGE = 'edu99/spring-boot-cicd-demo' // Harbor Project Name : edu01
 def K8S_NAMESPACE = 'ns-zcp-edu-99'
@@ -149,7 +149,7 @@ def VERSION = 'develop'
 // Pod template 시작
 podTemplate(label:label,
     // Kubernetes cluste에 배포하기 위한 secret
-    serviceAccount: “zcp-system-sa-${ZCP_USERID}”,
+    serviceAccount: "zcp-system-sa-${ZCP_USERID}",
     ...){
         ......
     }
