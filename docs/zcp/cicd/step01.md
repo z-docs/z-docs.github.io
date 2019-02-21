@@ -40,7 +40,7 @@ next: step02
    | Label | (선택값) | kubernetes의 resource의 label값으로 저장됨 |
    | docker-server | labs-registry.cloudzcp.io | Demo용 주소 |
    | docker-username | *userid* | Demo에 사용되는 Cloudz console ID |
-   | docker-password | *passowrd* | Demo에 사용되는 ID의 암호 |
+   | docker-password | *password* | Demo에 사용되는 ID의 암호 |
    | docker-email | (선택값) | |
    
    
@@ -61,7 +61,7 @@ next: step02
    
    ![](./img/2019-01-26-13-01-40.png)
 
-4. 왼쪽 메뉴에서 *Add Credentils* Click
+4. 왼쪽 메뉴에서 *Add Credentials* Click
 5. Git/Harbor *Username*과 *Password*를 입력함
    * ID: GIT_CREDENTIALS
    * ID: HARBOR_CREDENTIALS
