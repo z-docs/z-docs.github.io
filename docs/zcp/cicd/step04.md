@@ -54,10 +54,30 @@ spec:
           requests:
             cpu: 10m
             memory: 256Mi
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 40
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 3
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 40
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 3
 
 ```
 ## Pipeline 작성
-spring-boot-cicd-demo-dev-canary 이름으로 Pipeline작성
+sam-zcp-edu-99-canary 이름으로 Pipeline작성
 
 [Jenkins 참조](jenkins.md#pipeline-복사)
 
@@ -96,11 +116,11 @@ def DEPLOY_NAME = 'spring-boot-cicd-demo' // Previous Deployment
 ## Canary Deploy 조정
 
 ### Pipeline 작성
-spring-boot-cicd-demo-dev-adjustment 이름으로 Pipeline작성
+sam-zcp-edu-99-adjustment 이름으로 Pipeline작성
 
-[Step 02 Documentation 참조](step02.md)
+[Jenkins 참조](jenkins.md#pipeline-복사)
 
-1. Pipeline Script Path 수정 : jenkins-pipeline/canary-adjestment-pipeline
+1. Pipeline Script Path 수정 : jenkins-pipeline/canary-adjustment-pipeline
    
 ![](./img/2019-01-26-19-49-32.png)
 
@@ -119,8 +139,8 @@ spring-boot-cicd-demo-dev-adjustment 이름으로 Pipeline작성
 @Library('retort-lib') _
 def label = "jenkins-${UUID.randomUUID().toString()}"
  
-def ZCP_USERID = 'edu01'
-def K8S_NAMESPACE = 'edu01'
+def ZCP_USERID = 'edu99'
+def K8S_NAMESPACE = 'ns-zcp-edu-99'
 def TYPE = 'deployment'
 
 podTemplate(label:label,
