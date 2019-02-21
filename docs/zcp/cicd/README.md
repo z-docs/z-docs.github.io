@@ -50,7 +50,7 @@ next: /zcp/cicd/step01
 
 | Pros          | Cons                                               |
 | :------------ | :------------------------------------------------- |
-| Easy to setup | High impact on the user's erquest. downtime exists |
+| Easy to setup | High impact on the user's request. downtime exists |
 
 Example of yaml(manifest.yaml)
 ``` yaml
@@ -112,7 +112,7 @@ Traffice
 
 | Pros              | Cons                                                       |
 | :---------------- | :--------------------------------------------------------- |
-| Instanct update   | Expensive, need double the resources                       |
+| Instant update    | Expensive, need double the resources                       |
 | Good for frontend | Should proper test of the entire platform before releasing |
 
 Example of yaml(manifest-v2.yaml)
@@ -141,8 +141,8 @@ Traffic
 
 
 ### Canary
-> Rampled 배포 방식과 유사하나, Instance 일부를 선배포하고, 검증 이후에
-> 잔여 instane 모두를 배포하는 방식
+> Ramped 배포 방식과 유사하나, Instance 일부를 선배포하고, 검증 이후에
+> 잔여 instance 모두를 배포하는 방식
 > 선배포 검증에 실패할 경우 기존 Instance로 Rollback 처리함.
 
 |Pros|Cons|
@@ -162,7 +162,7 @@ Traffic
 ### Others
 
 * A/B Testing
-  * Canary 배포와 유사하며, 필요에 따라 유입되는 요청을 가각의 버전에 배분. 사용성 테스트를 수행함
+  * Canary 배포와 유사하며, 필요에 따라 유입되는 요청을 각각의 버전에 배분. 사용성 테스트를 수행함
   * 유입되는 요청은 네트웍 비율 기반, http header의 조건 값 등 다양한 조건을 처리가 가능해야함
   * Application에서 조건과 테스트 결과 값을 처리해야함
 * Shadow
