@@ -59,7 +59,7 @@ spec:
 ## Pipeline 작성
 spring-boot-cicd-demo-dev-canary 이름으로 Pipeline작성
 
-[Step 02 Documentation 참조](step02.md)
+[Jenkins 참조](jenkins.md#pipeline-복사)
 
 1. Pipeline Script Path 수정 : jenkins-pipeline/canary-pipeline
 
@@ -71,8 +71,8 @@ spring-boot-cicd-demo-dev-canary 이름으로 Pipeline작성
 @Library('retort-lib') _
 def label = "jenkins-${UUID.randomUUID().toString()}"
  
-def ZCP_USERID = 'edu01'
-def DOCKER_IMAGE = 'edu01/spring-boot-cicd-demo'
+def ZCP_USERID = 'edu99'
+def DOCKER_IMAGE = 'edu99/spring-boot-cicd-demo'
 def K8S_NAMESPACE = 'edu01'
 def VERSION = 'prod'
 def TYPE = 'deployment'

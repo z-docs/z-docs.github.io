@@ -10,11 +10,7 @@ next: step03
 ## Get Sample Application Source
 > Git 예제 프로젝트 설정
 
-<<<<<<< HEAD
-1. Open browser and go [https://labs-git.cloudzcp.io/edu99/sam-zcp-lab](https://labs-git.cloudzcp.io/edu99/sam-zcp-lab)
-=======
-1. Open browser and go [github.com/cnpst/sam-zcp-lab](https://github.com/cnpst/sam-zcp-lab)
->>>>>>> f27bd9835020ba16a5224fa1f352bf0125165bb4
+1. Open browser and go [https://labs-git.cloudzcp.io/edu99/sam-zcp-lab.git](https://labs-git.cloudzcp.io/edu99/sam-zcp-lab.git)
 2. 예제 프로젝트 Checkout
 * *Clone or download* > *Copy* click
 
