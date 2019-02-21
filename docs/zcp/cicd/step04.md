@@ -18,7 +18,7 @@ Canary Deploy 시나리오
 
 ## Deployment-canary.yaml 작성
 
-* spec.strategy.type: RollUpdate
+* spec.strategy.type: RollingUpdate
 
 ```yaml
 apiVersion: apps/v1
@@ -74,12 +74,12 @@ def label = "jenkins-${UUID.randomUUID().toString()}"
 def ZCP_USERID = 'edu01'
 def DOCKER_IMAGE = 'edu01/spring-boot-cicd-demo'
 def K8S_NAMESPACE = 'edu01'
-def VERSION = ‘prod’
-def TYPE = ＇deployment‘
-def DEPLOY_NAME = ＇spring-boot-cicd-demo‘ // Previous Deployment
+def VERSION = 'prod'
+def TYPE = 'deployment'
+def DEPLOY_NAME = 'spring-boot-cicd-demo' // Previous Deployment
 ...
-        stage(＇DEPLOY＇) {
-            container(＇kubectl＇) {
+        stage('DEPLOY') {
+            container('kubectl') {
                 // canary deployment 생성
                 kubeCmd.apply file: 'k8s/deployment-canary.yaml', namespace: K8S_NAMESPACE, wait: 300
                 // 기존 deployment 의 Instance 수를 4개로 조정
