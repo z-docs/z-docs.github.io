@@ -36,15 +36,17 @@ spec:
 ```
 
 ### Pipeline 작성
-spring-boot-cicd-demo-dev-rolling 이름으로 Pipeline작성
+sam-zcp-edu-99-rolling 이름으로 Pipeline작성
 
-[Step 02 Documentation 참조](step02.md)
+[Jenkins 참조](jenkins.md#pipeline-복사)
 
 1. Pipeline 설정에서 Parameter 설정 : VERSION 처리를 위해 Pipeline에 변수 추가
 2. General 영역에서 *이 빌드는 매개변수가 있습니다.* 체크
 3. 매개변수 추가 Click > String Parameter
    1. 매개변수명 : VERSION
    2. Default Value: develop
+   ![](./img/2019-02-21-14-19-19.png)
+   ![](./img/2019-02-21-14-20-15.png)
 4. Pipeline 영역
    1. Script Path : Production용 파일로 변경. jenkins-pipeline/rolling-pipeline
 5. Git project의 jenkins-pipeline/rolling-pipeline 파일 편집
@@ -55,8 +57,54 @@ spring-boot-cicd-demo-dev-rolling 이름으로 Pipeline작성
 ```
 7. Job 설정의 Deploy 변경
 
-```yaml
- yaml.update file: 'k8s/deployment.yaml', update: ['.spec.template.spec.containers[0].image': "${HARBOR_REGISTRY}/${DOCKER_IMAGE}:${VERSION}"]
+```groovy
+@Library('retort-lib') _
+def label = "jenkins-${UUID.randomUUID().toString()}"
+ 
+def ZCP_USERID = 'edu99'
+def DOCKER_IMAGE = 'edu99/spring-boot-cicd-demo'
+def K8S_NAMESPACE = 'ns-zcp-edu-99'
+//def VERSION = 'develop'
+ 
+podTemplate(label:label,
+    serviceAccount: "zcp-system-sa-${ZCP_USERID}",
+    containers: [
+        containerTemplate(name: 'maven', image: 'maven:3.5.2-jdk-8-alpine', ttyEnabled: true, command: 'cat'),
+        containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
+        containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl', ttyEnabled: true, command: 'cat')
+    ],
+    volumes: [
+        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+        persistentVolumeClaim(mountPath: '/root/.m2', claimName: 'zcp-jenkins-mvn-repo-custom2')
+    ]) {
+ 
+    node(label) {
+        stage('SOURCE CHECKOUT') {
+            def repo = checkout scm
+        }
+ 
+        stage('BUILD MAVEN') {
+            container('maven') {
+                mavenBuild goal: 'clean package', systemProperties:['maven.repo.local':"/root/.m2/${ZCP_USERID}"]
+            }
+        }
+ 
+        stage('BUILD DOCKER IMAGE') {
+            container('docker') {
+                dockerCmd.build tag: "${HARBOR_REGISTRY}/${DOCKER_IMAGE}:${VERSION}"
+                dockerCmd.push registry: HARBOR_REGISTRY, imageName: DOCKER_IMAGE, imageVersion: VERSION, credentialsId: "HARBOR_CREDENTIALS"
+            }
+        }
+ 
+        stage('DEPLOY') {
+            container('kubectl') {
+                
+                yaml.update file: 'k8s/deployment.yaml', update: ['.spec.template.spec.containers[0].image': "${HARBOR_REGISTRY}/${DOCKER_IMAGE}:${VERSION}"]
+                kubeCmd.apply file: 'k8s/deployment.yaml', namespace: K8S_NAMESPACE, wait: 300
+            }
+        }
+    }
+}
 
 ```
 ### 소스변경
@@ -78,42 +126,41 @@ spring-boot-cicd-demo-dev-rolling 이름으로 Pipeline작성
 ## Rolling rollback
 
 ### Pipeline 설정 
-spring-boot-cicd-demo-dev-rollback 이름으로 Pipeline작성
+sam-zcp-edu-99-rollback 이름으로 Pipeline작성
 
-[Step 02 Documentation 참조](step02.md)
+[Jenkins 참조](jenkins.md#pipeline-복사)
 
 1. Script Path 수정 : jenkins-pipeline/rollback-pipeline
 
     ![](./img/2019-01-26-19-16-35.png)
 
 2. 환경구성 & Volume은  Deploy 용만 작성
-3. Deploy rollback 명령어 작성
+3. Deploy rollback jenkins scrupt 작성 
 
 ```groovy
 @Library('retort-lib') _
 def label = "jenkins-${UUID.randomUUID().toString()}"
-def ZCP_USERID = 'edu01'
-def K8S_NAMESPACE = 'edu01'
-
-def TYPE = 'deployment' // Rollback Resource Type: Deployment/Statefulset etc
-def DEPLOY_NAME = 'spring-boot-cicd-demo' // Name of resource
+ 
+def ZCP_USERID = 'edu99'
+def K8S_NAMESPACE = 'ns-zcp-edu-99'
+def TYPE = 'deployment'
+def DEPLOY_NAME = 'spring-boot-cicd-demo'
 
 podTemplate(label:label,
-    serviceAccount: ＂zcp-system-sa-${ZCP_USERID}＂,
+    serviceAccount: "zcp-system-sa-${ZCP_USERID}",
     containers: [
-        // Kubectl 수행을 위한 kubectl container 만 기동시킴
         containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl', ttyEnabled: true, command: 'cat')
     ]) {
 
     node(label) {
         stage('ROLLBACK') {
             container('kubectl') {
-                // Rollback 수행
                 kubeCmd.rolloutUndo type: TYPE, name: DEPLOY_NAME, namespace: K8S_NAMESPACE, wait: 300
             }
         }
     }
 }
+
 ```
 
 ### Rollback 실행

@@ -20,8 +20,8 @@ next: /zcp/cicd/step01
 
 ### Solution 
 ::: tip
-* 운영환경과 동일한 Infrastructure/환경에서 테스트
-* 빈번하고 반복적인 테스트
+* 운영환경과 동일한 Infrastructure/환경에서 테스트 수행
+* 반복적인 테스트 수행 및 자동화
 * Code 기반으로 Development/Staging/Production 환경에 적용
 * 빠른 배포 환경
 * 표준화를 통한 빌드/배포 프로세스 자동화

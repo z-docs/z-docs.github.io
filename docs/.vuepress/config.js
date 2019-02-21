@@ -36,6 +36,7 @@ module.exports = {
                         '/zcp/cicd/step02',
                         '/zcp/cicd/step03',
                         '/zcp/cicd/step04',
+                        '/zcp/cicd/jenkins',
                     ]
                 },
                 {

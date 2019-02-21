@@ -12,6 +12,7 @@ next: step02
 2. Harbor Login (계정이 없을 경우 생성)
 
    ![](./img/2019-01-26-00-16-06.png)
+   ![](./img/2019-02-19-14-16-55.png)
 
 3. 좌측 메뉴에서 Projects > NEW PROJECT 클릭
    
@@ -46,6 +47,19 @@ next: step02
    
    ![](./img/2019-01-28-14-15-35.png)
 
+## Setup SCM
+
+1. 계정 생성
+   ![](./img/2019-02-19-14-26-31.png)
+   ![](./img/2019-02-19-14-27-51.png)
+
+2. 계정 연결 : console 계정 연결 설정
+   ![](./img/2019-02-19-14-30-16.png)
+
+3. 저장소 생성 :  fork sample [https://labs-git.cloudzcp.io/cloudzcp-admin/sam-zcp-lab](https://labs-git.cloudzcp.io/cloudzcp-admin/sam-zcp-lab)
+   ![](./img/2019-02-19-14-36-49.png)
+   ![](./img/2019-02-19-14-37-26.png)
+
 ## Set up Jenkins
 > Jenkins 에서 빌드/배포가 실행되면서 필요한 권한 설정과, Kubernetes를 위한 Pipeline 작성 법을 설명함.
 > Jenkins는  ZCP에서 관리하는 사용자그룹(Namespace)와 권한이 적용됨.
@@ -57,12 +71,14 @@ next: step02
 
 2. Namespace와 동일한 폴더 Click
    
-3. Jenmins 왼쪽 메뉴에서  *Credentials* > EDU01(in *Stores scoped to edu01*) > *Global credentilas* Click
+3. Jenmins 왼쪽 메뉴에서  *Credentials* > ns-zcp-edu-01(in *Stores scoped to ns-zcp-edu-01*) > *Global credentilas* Click
    
    ![](./img/2019-01-26-13-01-40.png)
+   ![](./img/2019-02-19-14-44-14.png)
+   ![](./img/2019-02-19-14-45-18.png)
+   ![](./img/2019-02-19-14-46-51.png)
 
-4. 왼쪽 메뉴에서 *Add Credentils* Click
-5. Git/Harbor *Username*과 *Password*를 입력함
+4. Git/Harbor *Username*과 *Password*를 입력함
    * ID: GIT_CREDENTIALS
    * ID: HARBOR_CREDENTIALS
   
