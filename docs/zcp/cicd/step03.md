@@ -53,7 +53,7 @@ sam-zcp-edu-99-rolling 이름으로 Pipeline작성
 6. *VERSION* 변수선언 주석 처리
 
 ```groovy
-// def VERSION = ‘develop’
+// def VERSION = 'develop'
 ```
 7. Job 설정의 Deploy 변경
 
