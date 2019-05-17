@@ -60,47 +60,49 @@ sam-zcp-edu-99-rolling 이름으로 Pipeline작성
 ```groovy
 @Library('retort-lib') _
 def label = "jenkins-${UUID.randomUUID().toString()}"
- 
-def ZCP_USERID = 'edu99'
-def DOCKER_IMAGE = 'edu99/spring-boot-cicd-demo'
-def K8S_NAMESPACE = 'ns-zcp-edu-99'
-//def VERSION = 'develop'
- 
+  
+def ZCP_USERID='zcpsample'
+def DOCKER_IMAGE='zcpsample/sam-springboot'
+def K8S_NAMESPACE='default'
+  
 podTemplate(label:label,
     serviceAccount: "zcp-system-sa-${ZCP_USERID}",
     containers: [
         containerTemplate(name: 'maven', image: 'maven:3.5.2-jdk-8-alpine', ttyEnabled: true, command: 'cat'),
-        containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
+//        containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
+        containerTemplate(name: 'docker', image: 'docker:17-dind', ttyEnabled: true, command: 'dockerd-entrypoint.sh', privileged: true),
         containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl', ttyEnabled: true, command: 'cat')
     ],
     volumes: [
-        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-        persistentVolumeClaim(mountPath: '/root/.m2', claimName: 'zcp-jenkins-mvn-repo-custom2')
+//        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+        persistentVolumeClaim(mountPath: '/root/.m2', claimName: 'zcp-jenkins-mvn-repo')
     ]) {
- 
+  
     node(label) {
         stage('SOURCE CHECKOUT') {
             def repo = checkout scm
+//            env.SCM_INFO = repo.inspect()
         }
- 
-        stage('BUILD MAVEN') {
+  
+        stage('BUILD') {
             container('maven') {
-                mavenBuild goal: 'clean package', systemProperties:['maven.repo.local':"/root/.m2/${ZCP_USERID}"]
+                mavenBuild goal: 'clean package', systemProperties:['maven.repo.local':"/root/.m2/${JOB_NAME}"]
             }
         }
- 
+  
         stage('BUILD DOCKER IMAGE') {
             container('docker') {
-                dockerCmd.build tag: "${HARBOR_REGISTRY}/${DOCKER_IMAGE}:${VERSION}"
-                dockerCmd.push registry: HARBOR_REGISTRY, imageName: DOCKER_IMAGE, imageVersion: VERSION, credentialsId: "HARBOR_CREDENTIALS"
+                dockerCmd.build tag: "${HARBOR_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}"
+                dockerCmd.push registry: HARBOR_REGISTRY, imageName: DOCKER_IMAGE, imageVersion: BUILD_NUMBER, credentialsId: "HARBOR_CREDENTIALS"
             }
         }
- 
+  
         stage('DEPLOY') {
             container('kubectl') {
-                
-                yaml.update file: 'k8s/deployment.yaml', update: ['.spec.template.spec.containers[0].image': "${HARBOR_REGISTRY}/${DOCKER_IMAGE}:${VERSION}"]
-                kubeCmd.apply file: 'k8s/deployment.yaml', namespace: K8S_NAMESPACE, wait: 300
+                kubeCmd.apply file: 'k8s/service.yaml', namespace: K8S_NAMESPACE
+                yaml.update file: 'k8s/deploy.yaml', update: ['.spec.template.spec.containers[0].image': "${HARBOR_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}"]
+  
+                kubeCmd.apply file: 'k8s/deploy.yaml', wait: 300, recoverOnFail: false, namespace: K8S_NAMESPACE
             }
         }
     }
