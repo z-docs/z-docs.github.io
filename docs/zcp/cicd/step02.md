@@ -10,7 +10,8 @@ next: step03
 ## Get Sample Application Source
 > Git 예제 프로젝트 설정
 
-1. Open browser and go [https://labs-git.cloudzcp.io/edu99/sam-zcp-lab.git](https://labs-git.cloudzcp.io/edu99/sam-zcp-lab.git)
+1. Open browser and go [https://vup-git.cloudzcp.io/edu99/sam-zcp-lab.git](https://vup-git.cloudzcp.io/edu99/sam-zcp-lab.git)
+
 2. 예제 프로젝트 Checkout
 * *Clone or download* > *Copy* click
 
@@ -45,29 +46,28 @@ next: step03
 
 ## Create Pipeline
 > 사용되는 정보
-* User ID : *edu99*
-* Namespace : *edu99*
+* User ID : *edu01*
+* Namespace : *edu01*
 * Application Project Name = *sam-zcp-lab*
-* 사용자 Git URL : https://labs-git.cloudzcp.io/*[edu99]*/sam-zcp-lab
+* 사용자 Git URL : https://vup-git.cloudzcp.io/*[edu01]*/sam-zcp-lab
 
 ### Development pipeline
 
-1. ns-zcp-edu-99 폴더  Click
+1. edu01 폴더  Click
 2. 왼쪽메뉴에서 *New Item* Click
 3. Inputbox에 **sam-zcp-edu-99**(jenkins jobname) 입력
 4. **Pipeline** 선택
-
-   ![](./img/2019-02-19-15-47-53.png)
+   ![](./img/2019-09-03-17-00-37.png)
 
 5. Pipeline에 필요한 정보 입력: Pipeline section으로 이동(Scroll down)
    * Definition 선택 : *Pipeline script from SCM*
    * SCM 선택: *Git*
    * Repositories
-     * Repository URL 입력: *https://labs-git.cloudzcp.io/[edu99]/sam-zcp-lab.git*
-     * Credentials 선택: *edu99/...(GIT CREDENTIALS)*
+     * Repository URL 입력: *https://vup-git.cloudzcp.io/[edu01]/sam-zcp-lab.git*
+     * Credentials 선택: *edu01/...(GIT CREDENTIALS)*
    * Branch to build 입력 : **/master*
    * Repository browser 선택 : *gogs*
-     * URL 입력: *https://labs-git.cloudzcp.io/[edu99]/sam-zcp-lab* ( '.git' 제거, browser url )
+     * URL 입력: *https://vup-git.cloudzcp.io/[edu01]/sam-zcp-lab* ( '.git' 제거, browser url )
    * Script Path 입력 : *jenkins-pipeline/deploy-pipeline* ( Git프로젝트 Root Path기준 상대 경로 )
    * 저장
    ![](./img/2019-02-19-15-52-11.png)
@@ -96,16 +96,16 @@ next: step03
 ...
       containers:
       - name: spring-boot-cicd-demo
-        image: labs-registry.cloudzcp.io/edu99/spring-boot-cicd-demo:develop
+        image: vup-registry.cloudzcp.io/edu01/spring-boot-cicd-demo:develop
         ports:
         - containerPort: 8080
           name: tomcat
 ...
 ```
 2. k8s/ingress.yaml 작성
-> 외부에 서비스 노출에 필요한 Domain 정보 설정
-> 사용자 ID 기준으로 host 정보 변경
-> (테스트용) host 파일에 IP(169.56.106.158) 등록
+> 외부에 서비스 노출에 필요한 Domain 정보 설정<br/>
+> 사용자 ID 기준으로 hosts 정보 변경<br/>
+> (테스트용) Local hosts 파일에 IP(169.56.171.70) 등록
 
 ```yaml
 apiVersion: extensions/v1beta1
@@ -114,7 +114,7 @@ metadata:
   name: spring-boot-cicd-demo
 spec:
   rules:
-  - host: [edu99.cloudzcp.io]
+  - host: edu01.cloudzcp.io
     http:
       paths:
       - path: /
@@ -141,14 +141,14 @@ spec:
 @Library("retort-lib") _
 // Jenkins slave pod에 uuid 생성
 def label = "Jenkins-${UUID.randomUUID().toString()}"
-def ZCP_USERID = 'edu99'
-def DOCKER_IMAGE = 'edu99/spring-boot-cicd-demo' // Harbor Project Name : edu01
-def K8S_NAMESPACE = 'ns-zcp-edu-99'
+def ZCP_USERID = 'edu01'
+def DOCKER_IMAGE = 'edu01/spring-boot-cicd-demo' // Harbor Project Name : edu01
+def K8S_NAMESPACE = 'edu01'
 def VERSION = 'develop'
 
 // Pod template 시작
 podTemplate(label:label,
-    // Kubernetes cluste에 배포하기 위한 secret
+    // Kubernetes cluste에 배포하기 위한 secret
     serviceAccount: "zcp-system-sa-${ZCP_USERID}",
     ...){
         ......
@@ -175,22 +175,20 @@ Script Source
 @Library('retort-lib') _
 def label = "jenkins-${UUID.randomUUID().toString()}"
  
-def ZCP_USERID = 'edu99'
-def DOCKER_IMAGE = 'edu99/spring-boot-cicd-demo'
-def K8S_NAMESPACE = 'ns-zcp-edu-99'
+def ZCP_USERID = 'edu01'
+def DOCKER_IMAGE = 'edu01/spring-boot-cicd-demo'
+def K8S_NAMESPACE = 'edu01'
 def VERSION = 'develop'
  
 podTemplate(label:label,
     serviceAccount: "zcp-system-sa-${ZCP_USERID}",
     containers: [
         containerTemplate(name: 'maven', image: 'maven:3.5.2-jdk-8-alpine', ttyEnabled: true, command: 'cat'),
-        containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat', envVars: [
-            envVar(key: 'DOCKER_HOST', value: 'tcp://jenkins-dind-service:2375 ')]),
-        containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl', ttyEnabled: true, command: 'cat')
+        containerTemplate(name: 'docker', image: 'docker:17-dind', ttyEnabled: true, command: 'dockerd-entrypoint.sh', privileged: true),
+        containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.13.6', ttyEnabled: true, command: 'cat')
     ],
     volumes: [
-        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-        persistentVolumeClaim(mountPath: '/root/.m2', claimName: 'zcp-jenkins-mvn-repo-custom2')
+        persistentVolumeClaim(mountPath: '/root/.m2', claimName: 'zcp-jenkins-mvn-repo')
     ]) {
  
     node(label) {
@@ -233,6 +231,6 @@ podTemplate(label:label,
 
    ![](./img/2019-01-26-15-35-02.png)
 
-4. Open Browser : [http://edu99.cloudzcp.io](http://edu99.cloudzcp.io)
+4. Open Browser : [http://edu01.cloudzcp.io](http://edu01.cloudzcp.io)
 ---
 [[toc]]

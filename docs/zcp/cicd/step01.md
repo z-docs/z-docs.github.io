@@ -39,7 +39,7 @@ next: step02
    | Secret Name | harbor-secret | Deployment.yaml에서 지정된 secret이름과 동일해야함 |
    | Secret Type | Docker Registry | -- |
    | Label | (선택값) | kubernetes의 resource의 label값으로 저장됨 |
-   | docker-server | pog-dev-registry.cloudzcp.io | Demo용 주소 |
+   | docker-server | vup-registry.cloudzcp.io | Demo용 주소 |
    | docker-username | *userid* | Demo에 사용되는 Cloudz console ID |
    | docker-password | *password* | Demo에 사용되는 ID의 암호 |
    | docker-email | (선택값) | |
@@ -56,34 +56,33 @@ next: step02
 2. 계정 연결 : console 계정 연결 설정
    ![](./img/2019-02-19-14-30-16.png)
 
-3. 저장소 생성 :  fork sample [https://labs-git.cloudzcp.io/cloudzcp-admin/sam-zcp-lab](https://labs-git.cloudzcp.io/cloudzcp-admin/sam-zcp-lab)
+3. 저장소 생성  
+Fork sample URL :
+[https://vup-git.cloudzcp.io/cloudzcp-admin/sam-zcp-lab](https://vup-git.cloudzcp.io/cloudzcp-admin/sam-zcp-lab)
    ![](./img/2019-02-19-14-36-49.png)
    ![](./img/2019-02-19-14-37-26.png)
 
 ## Set up Jenkins
 > Jenkins 에서 빌드/배포가 실행되면서 필요한 권한 설정과, Kubernetes를 위한 Pipeline 작성 법을 설명함.
-> Jenkins는  ZCP에서 관리하는 사용자그룹(Namespace)와 권한이 적용됨.
-> 사용되는 정보는 User ID = *user01* Namespace = *edu01*
+> Jenkins는  ZCP에서 관리하는 사용자그룹(Namespace)과 권한이 적용됨.
+> 사용되는 정보는 User ID = *edu01* Namespace = *edu01*
 
 1. Jenkins : Web Console에서, *Devops* > *빌드 및 배포*
    
    ![](./img/2019-01-26-12-57-10.png)
 
 2. Namespace와 동일한 폴더 Click
-   
-3. Jenmins 왼쪽 메뉴에서  *Credentials* > ns-zcp-edu-01(in *Stores scoped to ns-zcp-edu-01*) > *Global credentilas* Click
+   ![](./img/2019-09-03-15-56-58.png)
+3. Jenkins 왼쪽 메뉴에서  *Credentials* > edu01(in *Stores scoped to edu01*) > *Global credentilas* Click
    
    ![](./img/2019-01-26-13-01-40.png)
-   ![](./img/2019-02-19-14-44-14.png)
-   ![](./img/2019-02-19-14-45-18.png)
-   ![](./img/2019-02-19-14-46-51.png)
 
 
 4. 왼쪽 메뉴에서 *Add Credentials* Click
+
 5. Git/Harbor *Username*과 *Password*를 입력함
    * ID: GIT_CREDENTIALS
    * ID: HARBOR_CREDENTIALS
-  
    ![](./img/2019-01-26-13-24-33.png)
    ![](./img/2019-01-26-13-25-30.png)
 ---
