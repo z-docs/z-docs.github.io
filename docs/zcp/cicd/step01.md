@@ -39,7 +39,7 @@ next: step02
    | Secret Name | harbor-secret | Deployment.yaml에서 지정된 secret이름과 동일해야함 |
    | Secret Type | Docker Registry | -- |
    | Label | (선택값) | kubernetes의 resource의 label값으로 저장됨 |
-   | docker-server | labs-registry.cloudzcp.io | Demo용 주소 |
+   | docker-server | pog-dev-registry.cloudzcp.io | Demo용 주소 |
    | docker-username | *userid* | Demo에 사용되는 Cloudz console ID |
    | docker-password | *password* | Demo에 사용되는 ID의 암호 |
    | docker-email | (선택값) | |
