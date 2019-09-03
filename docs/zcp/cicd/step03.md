@@ -12,8 +12,8 @@ next: step04
 ### Deployment 수정
 
 * spec.strategy.type: Rollingupdate  # 배포방식 설정
-* spec.strategy.rollingUpdate.maxSurge: 1  # Rolling 단위 설정
-* spec.strategy.rollingUpdate.maxUnavailable: 1 # down pod 최소 단위
+* spec.strategy.rollingUpdate.maxSurge: 1  # up pod 최대 단위
+* spec.strategy.rollingUpdate.maxUnavailable: 1 # down pod 최대 단위
 
 ```yaml
 apiVersion: apps/v1
@@ -36,7 +36,7 @@ spec:
 ```
 
 ### Pipeline 작성
-sam-zcp-edu-99-rolling 이름으로 Pipeline작성
+sam-zcp-lab-rolling 이름으로 Pipeline작성
 
 [Jenkins 참조](jenkins.md#pipeline-복사)
 
@@ -61,48 +61,46 @@ sam-zcp-edu-99-rolling 이름으로 Pipeline작성
 @Library('retort-lib') _
 def label = "jenkins-${UUID.randomUUID().toString()}"
   
-def ZCP_USERID='zcpsample'
-def DOCKER_IMAGE='zcpsample/sam-springboot'
-def K8S_NAMESPACE='default'
+def ZCP_USERID='edu01'
+def DOCKER_IMAGE='edu01/sam-zcp-lab'
+def K8S_NAMESPACE='edu01'
+// def VERSION = 'develop'
   
 podTemplate(label:label,
     serviceAccount: "zcp-system-sa-${ZCP_USERID}",
     containers: [
         containerTemplate(name: 'maven', image: 'maven:3.5.2-jdk-8-alpine', ttyEnabled: true, command: 'cat'),
-//        containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
         containerTemplate(name: 'docker', image: 'docker:17-dind', ttyEnabled: true, command: 'dockerd-entrypoint.sh', privileged: true),
-        containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl', ttyEnabled: true, command: 'cat')
+        containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.13.6', ttyEnabled: true, command: 'cat')
     ],
     volumes: [
-//        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
         persistentVolumeClaim(mountPath: '/root/.m2', claimName: 'zcp-jenkins-mvn-repo')
     ]) {
   
     node(label) {
         stage('SOURCE CHECKOUT') {
             def repo = checkout scm
-//            env.SCM_INFO = repo.inspect()
         }
   
         stage('BUILD') {
             container('maven') {
-                mavenBuild goal: 'clean package', systemProperties:['maven.repo.local':"/root/.m2/${JOB_NAME}"]
+                mavenBuild goal: 'clean package', systemProperties:['maven.repo.local':"/root/.m2/${ZCP_USERID}"]
             }
         }
   
         stage('BUILD DOCKER IMAGE') {
             container('docker') {
-                dockerCmd.build tag: "${HARBOR_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}"
-                dockerCmd.push registry: HARBOR_REGISTRY, imageName: DOCKER_IMAGE, imageVersion: BUILD_NUMBER, credentialsId: "HARBOR_CREDENTIALS"
+                dockerCmd.build tag: "${HARBOR_REGISTRY}/${DOCKER_IMAGE}:${VERSION}"
+                dockerCmd.push registry: HARBOR_REGISTRY, imageName: DOCKER_IMAGE, imageVersion: VERSION, credentialsId: 'HARBOR_CREDENTIALS'
             }
         }
   
         stage('DEPLOY') {
             container('kubectl') {
                 kubeCmd.apply file: 'k8s/service.yaml', namespace: K8S_NAMESPACE
-                yaml.update file: 'k8s/deploy.yaml', update: ['.spec.template.spec.containers[0].image': "${HARBOR_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}"]
+                yaml.update file: 'k8s/deployment.yaml', update: ['.spec.template.spec.containers[0].image': "${HARBOR_REGISTRY}/${DOCKER_IMAGE}:${VERSION}"]
   
-                kubeCmd.apply file: 'k8s/deploy.yaml', wait: 300, recoverOnFail: false, namespace: K8S_NAMESPACE
+                kubeCmd.apply file: 'k8s/deployment.yaml', wait: 300, recoverOnFail: false, namespace: K8S_NAMESPACE
             }
         }
     }
@@ -128,7 +126,7 @@ podTemplate(label:label,
 ## Rolling rollback
 
 ### Pipeline 설정 
-sam-zcp-edu-99-rollback 이름으로 Pipeline작성
+sam-zcp-lab-rollback 이름으로 Pipeline작성
 
 [Jenkins 참조](jenkins.md#pipeline-복사)
 
@@ -143,15 +141,15 @@ sam-zcp-edu-99-rollback 이름으로 Pipeline작성
 @Library('retort-lib') _
 def label = "jenkins-${UUID.randomUUID().toString()}"
  
-def ZCP_USERID = 'edu99'
-def K8S_NAMESPACE = 'ns-zcp-edu-99'
+def ZCP_USERID = 'edu01'
+def K8S_NAMESPACE = 'edu01'
 def TYPE = 'deployment'
 def DEPLOY_NAME = 'spring-boot-cicd-demo'
 
 podTemplate(label:label,
     serviceAccount: "zcp-system-sa-${ZCP_USERID}",
     containers: [
-        containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl', ttyEnabled: true, command: 'cat')
+        containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.13.6', ttyEnabled: true, command: 'cat')
     ]) {
 
     node(label) {
